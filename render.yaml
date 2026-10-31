@@ -1,0 +1,35 @@
+# This configuration is for review before deployment. The listed compute plans
+# are paid resources: confirm the host's displayed charges before creating them.
+services:
+  - type: web
+    name: ai-idea-merger-web
+    runtime: docker
+    plan: 1c-2g
+    dockerfilePath: ./Dockerfile.public
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: off
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ai-idea-merger-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CHAT_ENCRYPTION_KEY
+        generateValue: true
+      - key: EMBEDDING_BACKEND
+        value: sentence-transformers
+      - key: HF_HUB_OFFLINE
+        value: "1"
+      - key: TOKENIZERS_PARALLELISM
+        value: "false"
+databases:
+  - name: ai-idea-merger-db
+    databaseName: idea_merger
+    user: idea_merger
+    plan: 0.1c-256mb
+    diskSizeGB: 1
+    ipAllowList: []
